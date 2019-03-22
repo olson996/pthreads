@@ -32,7 +32,7 @@ int main(){
         pthread_join(tid[i], NULL);
     }
     time = clock()-time;
-    printf("Time in ticks: %ld", time/1000);
+    printf("Time in ticks: %ld\n", time/1000);
     printf("sum: %d\n", sum);
 
 

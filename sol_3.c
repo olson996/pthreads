@@ -32,7 +32,7 @@ int main(){
 	sum += thread_sum[i];
     }
     time = clock()-time;
-    printf("Time used: %ld\n", time/1000);
+    printf("Time in ticks: %ld\n", time/1000);
     printf("sum: %d\n", sum);
 
 
