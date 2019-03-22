@@ -6,7 +6,8 @@
 #define thread_count 8
 long N = 800000;
 
-//global prime # counter
+
+//scalar global sum
 int sum;
 
 //initialize mutex 
@@ -21,9 +22,8 @@ int main(){
     pthread_t tid[thread_count];
     pthread_attr_t attr;
     pthread_attr_init(&attr);
-
-    clock_t time = clock();
 	//create threads
+    clock_t time = clock();
     for(int i=0; i<thread_count; i++){
         pthread_create(&tid[i], &attr, thread_func, (void*)i);
     }
@@ -32,7 +32,7 @@ int main(){
         pthread_join(tid[i], NULL);
     }
     time = clock()-time;
-    printf("Time in ticks: %ld", time/1000);
+    printf("Time in ticks: %ld\n", time/1000);
     printf("sum: %d\n", sum);
 
 
@@ -46,6 +46,9 @@ void* thread_func(void* rank){
     //number indexes to check prime #s based on thread #
     long index1 = (N/thread_count) * my_rank + 1;
     long index2 = (N/thread_count) * (my_rank+1);
+
+    int local_sum=0;
+    
     
     //prints index ranges for each thread
     //printf("index1: %ld index2: %ld\n", index1, index2);
@@ -53,12 +56,14 @@ void* thread_func(void* rank){
         int flag = is_prime(index1);
 	//prime number func returns 0 if true.    (!flag) == prime
         if(!flag){
-		//critical section
-	    pthread_mutex_lock(&mutex);
-	        sum+=1;
-	    pthread_mutex_unlock(&mutex);
+	    local_sum+=1;
 	}
     }
+    //lock while updating global scalar sum
+    pthread_mutex_lock(&mutex);
+	sum += local_sum;
+    pthread_mutex_unlock(&mutex);
+
     pthread_exit(0);
     return NULL;
 }

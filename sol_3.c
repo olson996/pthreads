@@ -1,10 +1,10 @@
-#include <sys/time.h>
+#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
 
 #define thread_count 8
-long N = 80000;
+long N = 800000;
 
 //global array for prime # counter
 int thread_sum[8];
@@ -20,6 +20,8 @@ int main(){
     pthread_t tid[thread_count];
     pthread_attr_t attr;
     pthread_attr_init(&attr);
+
+    clock_t time = clock();
 	//create threads
     for(int i=0; i<thread_count; i++){
         pthread_create(&tid[i], &attr, thread_func, (void*)i);
@@ -29,6 +31,8 @@ int main(){
         pthread_join(tid[i], NULL);
 	sum += thread_sum[i];
     }
+    time = clock()-time;
+    printf("Time used: %ld\n", time/1000);
     printf("sum: %d\n", sum);
 
 
