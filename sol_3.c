@@ -8,17 +8,14 @@ long N = 80000;
 
 //global array for prime # counter
 int thread_sum[8];
-//scalar global sum
-int sum;
-
-//initialize mutex 
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 //function prototypes
 int is_prime(long);
 void*thread_func(void*);
 
 int main(){
+        //local sum
+    int sum;
 	//initialize pthread ids
     pthread_t tid[thread_count];
     pthread_attr_t attr;
@@ -30,6 +27,7 @@ int main(){
     	//join threads
     for(int i=0; i<thread_count; i++){
         pthread_join(tid[i], NULL);
+	sum += thread_sum[i];
     }
     printf("sum: %d\n", sum);
 
@@ -46,7 +44,7 @@ void* thread_func(void* rank){
     long index2 = (N/thread_count) * (my_rank+1);
     
     
-    //prints index ranges for each thread
+    //prints the index ranges for each thread
     //printf("index1: %ld index2: %ld\n", index1, index2);
     for(index1; index1<index2+1; index1++){
         int flag = is_prime(index1);
@@ -55,10 +53,6 @@ void* thread_func(void* rank){
 	    thread_sum[my_rank]+=1;
 	}
     }
-    //lock while updating global scalar sum
-    pthread_mutex_lock(&mutex);
-	sum += thread_sum[my_rank];
-    pthread_mutex_unlock(&mutex);
 
     pthread_exit(0);
     return NULL;

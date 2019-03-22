@@ -44,7 +44,8 @@ void* thread_func(void* rank){
     long index1 = (N/thread_count) * my_rank + 1;
     long index2 = (N/thread_count) * (my_rank+1);
     
-    printf("index1: %ld index2: %ld\n", index1, index2);
+    //prints index ranges for each thread
+    //printf("index1: %ld index2: %ld\n", index1, index2);
     for(index1; index1<index2+1; index1++){
         int flag = is_prime(index1);
 	//prime number func returns 0 if true.    (!flag) == prime
