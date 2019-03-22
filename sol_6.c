@@ -46,7 +46,7 @@ int main(){
 
 void* thread_func(void* rank){
     int my_rank = (int)rank;
-    while(N_counter < N+2){
+    while(N_counter < N+1){
         long index1 = 0;
         long index2 = 0;
         pthread_mutex_lock(&mutex);
@@ -56,7 +56,7 @@ void* thread_func(void* rank){
         //printf("N_counter: %ld, rank: %d\n", N_counter, my_rank);
 
         pthread_mutex_unlock(&mutex);
-        if(N_counter >= N+2){
+        if(N_counter >= N+1){
 	    break;
 	}
     
