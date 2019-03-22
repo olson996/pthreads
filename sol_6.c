@@ -4,10 +4,11 @@
 #include <pthread.h>
 
 #define thread_count 8
+int thread_sum[8];
+long N_counter = 0;
 long N = 800000;
 
-//global prime # counter
-int sum;
+
 
 //initialize mutex 
 pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -21,6 +22,7 @@ int main(){
     pthread_t tid[thread_count];
     pthread_attr_t attr;
     pthread_attr_init(&attr);
+    int sum=0;
 
     clock_t time = clock();
 	//create threads
@@ -30,6 +32,7 @@ int main(){
     	//join threads
     for(int i=0; i<thread_count; i++){
         pthread_join(tid[i], NULL);
+	sum+=thread_sum[i];
     }
     time = clock()-time;
     printf("Time in ticks: %ld\n", time/1000);
@@ -42,28 +45,35 @@ int main(){
 }
 
 void* thread_func(void* rank){
-    
     int my_rank = (int)rank;
-    //number indexes to check prime #s based on thread #
-    long index1 = (N/thread_count) * my_rank + 1;
-    long index2 = (N/thread_count) * (my_rank+1);
-    
-    //prints index ranges for each thread
-    //printf("index1: %ld index2: %ld\n", index1, index2);
-    for(index1; index1<index2+1; index1++){
-        int flag = is_prime(index1);
-	//prime number func returns 0 if true.    (!flag) == prime
-        if(!flag){
-		//critical section
-	    pthread_mutex_lock(&mutex);
-	        sum+=1;
-	    pthread_mutex_unlock(&mutex);
+    while(N_counter < N+2){
+        long index1 = 0;
+        long index2 = 0;
+        pthread_mutex_lock(&mutex);
+        index1 = N_counter+1;
+        index2 = N_counter+100;
+        N_counter+=100;
+        //printf("N_counter: %ld, rank: %d\n", N_counter, my_rank);
+
+        pthread_mutex_unlock(&mutex);
+        if(N_counter >= N+2){
+	    break;
 	}
-    }
-  
     
+        //prints index ranges for each thread
+        //printf("index1: %ld index2: %ld thread#: %d\n", index1, index2, my_rank);
+        for(index1; index1<index2+1; index1++){
+            int flag = is_prime(index1);
+	    //prime number func returns 0 if true.    (!flag) == prime
+            if(!flag){
+	        thread_sum[my_rank]+=1;
+	    }
+        }
+   
+    }
     pthread_exit(0);
     return NULL;
+    
 }
 
 
